@@ -12,6 +12,17 @@ import {
 import { Formik } from "formik";
 import * as yup from "yup";
 
+//khung của khung
+const FieldWrapper = ({ label, formikProps, formikKey, children }) => (
+  <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
+    <Text style={{ marginBottom: 3 }}>{label}</Text>
+    {children}
+    <Text style={styles.errorHandler}>
+      {formikProps.touched[formikKey] && formikProps.errors[formikKey]}
+    </Text>
+  </View>
+);
+
 //kiểu như tạo một interface(bộ xương)
 //để có thể xài lại mà ko cần phải khai báo nhiều lần
 const StyleInput = ({ label, formikProps, formikKey, ...rest }) => {
@@ -27,32 +38,22 @@ const StyleInput = ({ label, formikProps, formikKey, ...rest }) => {
     inputStyle.borderWidth = 2;
   }
 
-  //khung chính của input
   return (
-    <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
-      <Text style={{ marginBottom: 3 }}>{label}</Text>
-      <View style={inputStyle}>
-        <TextInput
-          onChangeText={formikProps.handleChange(formikKey)}
-          onBlur={formikProps.handleBlur(formikKey)}
-          {...rest}
-        />
-      </View>
-      <Text style={styles.errorHandler}>
-        {/* use [formikKey] instead of .formikKey becasue we not accessing
-      it directly but we want to looking for the formikKey on the 
-      "touched" object or the "errors" object */}
-        {formikProps.touched[formikKey] && formikProps.errors[formikKey]}
-      </Text>
-    </View>
+    <FieldWrapper label={label} formikProps={formikProps} formikKey={formikKey}>
+      <TextInput
+        style={inputStyle}
+        onChangeText={formikProps.handleChange(formikKey)}
+        onBlur={formikProps.handleBlur(formikKey)}
+        {...rest}
+      />
+    </FieldWrapper>
   );
 };
 
 //khung chính của Switch
 const StyleSwitch = ({ label, formikProps, formikKey, ...rest }) => {
   return (
-    <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
-      <Text style={{ marginBottom: 3 }}>{label}</Text>
+    <FieldWrapper label={label} formikProps={formikProps} formikKey={formikKey}>
       <Switch
         value={formikProps.values[formikKey]}
         // setFieldValue(thingWeWantToChange, theValueOfThatThing)
@@ -61,25 +62,19 @@ const StyleSwitch = ({ label, formikProps, formikKey, ...rest }) => {
         }}
         {...rest}
       />
-      <Text style={styles.errorHandler}>
-        {/* use [formikKey] instead of .formikKey becasue we not accessing
-      it directly but we want to looking for the formikKey on the 
-      "touched" object or the "errors" object */}
-        {formikProps.touched[formikKey] && formikProps.errors[formikKey]}
-      </Text>
-    </View>
+    </FieldWrapper>
   );
 };
 
 //validation requirements
 const validationSchema = yup.object().shape({
-  /*   email: yup.string().label("Email").email().required(),
+  email: yup.string().label("Email").email().required(),
   password: yup
     .string()
     .label("Password")
     .required()
     .min(2, "At least 2 characters")
-    .max(15, "At most 15 characters"), */
+    .max(15, "At most 15 characters"),
   agreeToTerm: yup
     .boolean()
     .label("Term")
@@ -110,6 +105,7 @@ export default function App() {
               formikKey='email'
               placeholder='example@gmail.com'
               autoFocus
+              keyboardType='email-address'
             />
 
             {/* Ô nhập password dùng khung có sẵn */}
@@ -127,38 +123,6 @@ export default function App() {
               formikProps={formikProps}
               formikKey='agreeToTerm'
             />
-
-            {/* Khung nhập email original */}
-            {/* <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
-              <Text style={{ marginBottom: 3 }}>Email</Text>
-              <View style={styles.input}>
-                <TextInput
-                  placeholder='example@gmail.com'
-                  onChangeText={formikProps.handleChange("email")}
-                  onBlur={formikProps.handleBlur("email")}
-                  autoFocus
-                />
-              </View>
-              <Text style={styles.errorHandler}>
-                {formikProps.touched.email && formikProps.errors.email}
-              </Text>
-            </View> */}
-
-            {/* Khung nhập password original */}
-            {/* <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
-              <Text style={{ marginBottom: 3 }}>Password</Text>
-              <View style={styles.input}>
-                <TextInput
-                  placeholder='password'
-                  onChangeText={formikProps.handleChange("password")}
-                  onBlur={formikProps.handleBlur("password")}
-                  secureTextEntry
-                />
-              </View>
-              <Text style={styles.errorHandler}>
-                {formikProps.touched.password && formikProps.errors.password}
-              </Text>
-            </View> */}
 
             {formikProps.isSubmitting ? (
               <ActivityIndicator />
