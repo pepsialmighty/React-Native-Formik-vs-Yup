@@ -48,22 +48,53 @@ const StyleInput = ({ label, formikProps, formikKey, ...rest }) => {
   );
 };
 
+//khung chính của Switch
+const StyleSwitch = ({ label, formikProps, formikKey, ...rest }) => {
+  return (
+    <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
+      <Text style={{ marginBottom: 3 }}>{label}</Text>
+      <Switch
+        value={formikProps.values[formikKey]}
+        // setFieldValue(thingWeWantToChange, theValueOfThatThing)
+        onValueChange={(value) => {
+          formikProps.setFieldValue(formikKey, value);
+        }}
+        {...rest}
+      />
+      <Text style={styles.errorHandler}>
+        {/* use [formikKey] instead of .formikKey becasue we not accessing
+      it directly but we want to looking for the formikKey on the 
+      "touched" object or the "errors" object */}
+        {formikProps.touched[formikKey] && formikProps.errors[formikKey]}
+      </Text>
+    </View>
+  );
+};
+
 //validation requirements
 const validationSchema = yup.object().shape({
-  email: yup.string().label("Email").email().required(),
+  /*   email: yup.string().label("Email").email().required(),
   password: yup
     .string()
     .label("Password")
     .required()
     .min(2, "At least 2 characters")
-    .max(15, "At most 15 characters"),
+    .max(15, "At most 15 characters"), */
+  agreeToTerm: yup
+    .boolean()
+    .label("Term")
+    .test(
+      "is-true",
+      "Must agree to Term to continue",
+      (value) => value === true
+    ),
 });
 
 export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <Formik
-        initialValues={{ email: "", password: "" }}
+        initialValues={{ email: "", password: "", agreeToTerm: false }}
         onSubmit={(values, actions) => {
           alert(JSON.stringify(values));
           setTimeout(() => actions.setSubmitting(false), 1000);
@@ -88,6 +119,13 @@ export default function App() {
               formikKey='password'
               placeholder='password'
               secureTextEntry
+            />
+
+            {/* Ô Switch */}
+            <StyleSwitch
+              label='Agree to Term'
+              formikProps={formikProps}
+              formikKey='agreeToTerm'
             />
 
             {/* Khung nhập email original */}
