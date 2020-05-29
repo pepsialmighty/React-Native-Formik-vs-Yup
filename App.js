@@ -12,19 +12,20 @@ import { Formik } from "formik";
 import * as yup from "yup";
 
 const validationSchema = yup.object().shape({
-  name: yup
+  email: yup.string().label("Email").email().required(),
+  password: yup
     .string()
+    .label("Password")
     .required()
-    .label("Name")
     .min(2, "At least 2 characters")
-    .max(15, "At mosr 15 characters"),
+    .max(15, "At most 15 characters"),
 });
 
 export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <Formik
-        initialValues={{ name: "" }}
+        initialValues={{ email: "", password: "" }}
         onSubmit={(values, actions) => {
           alert(JSON.stringify(values));
           setTimeout(() => actions.setSubmitting(false), 1000);
@@ -33,13 +34,35 @@ export default function App() {
       >
         {(formikProps) => (
           <React.Fragment>
-            <View style={styles.input}>
-              <TextInput
-                placeholder='Type here'
-                onChangeText={formikProps.handleChange("name")}
-              />
+            <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
+              <Text style={{ marginBottom: 3 }}>Email</Text>
+              <View style={styles.input}>
+                <TextInput
+                  placeholder='example@gmail.com'
+                  onChangeText={formikProps.handleChange("email")}
+                  onBlur={formikProps.handleBlur("email")}
+                  autoFocus
+                />
+              </View>
+              <Text style={styles.errorHandler}>
+                {formikProps.touched.email && formikProps.errors.email}
+              </Text>
             </View>
-            <Text style={styles.errorHandler}>{formikProps.errors.name}</Text>
+
+            <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
+              <Text style={{ marginBottom: 3 }}>Password</Text>
+              <View style={styles.input}>
+                <TextInput
+                  placeholder='password'
+                  onChangeText={formikProps.handleChange("password")}
+                  onBlur={formikProps.handleBlur("password")}
+                />
+              </View>
+              <Text style={styles.errorHandler}>
+                {formikProps.touched.password && formikProps.errors.password}
+              </Text>
+            </View>
+
             {formikProps.isSubmitting ? (
               <ActivityIndicator />
             ) : (
