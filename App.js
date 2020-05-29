@@ -48,6 +48,26 @@ const StyleInput = ({ label, formikProps, formikKey, ...rest }) => {
       />
     </FieldWrapper>
   );
+
+  // khung chính của input
+  // return (
+  //   <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
+  //     <Text style={{ marginBottom: 3 }}>{label}</Text>
+  //     <View style={inputStyle}>
+  //       <TextInput
+  //         onChangeText={formikProps.handleChange(formikKey)}
+  //         onBlur={formikProps.handleBlur(formikKey)}
+  //         {...rest}
+  //       />
+  //     </View>
+  //     <Text style={styles.errorHandler}>
+  //       {/* use [formikKey] instead of .formikKey becasue we not accessing
+  //     it directly but we want to looking for the formikKey on the
+  //     "touched" object or the "errors" object */}
+  //       {formikProps.touched[formikKey] && formikProps.errors[formikKey]}
+  //     </Text>
+  //   </View>
+  // );
 };
 
 //khung chính của Switch
@@ -64,6 +84,27 @@ const StyleSwitch = ({ label, formikProps, formikKey, ...rest }) => {
       />
     </FieldWrapper>
   );
+
+  //khung chính của Switch
+  // return (
+  //   <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
+  //     <Text style={{ marginBottom: 3 }}>{label}</Text>
+  //     <Switch
+  //       value={formikProps.values[formikKey]}
+  //       // setFieldValue(thingWeWantToChange, theValueOfThatThing)
+  //       onValueChange={(value) => {
+  //         formikProps.setFieldValue(formikKey, value);
+  //       }}
+  //       {...rest}
+  //     />
+  //     <Text style={styles.errorHandler}>
+  //       {/* use [formikKey] instead of .formikKey becasue we not accessing
+  //     it directly but we want to looking for the formikKey on the
+  //     "touched" object or the "errors" object */}
+  //       {formikProps.touched[formikKey] && formikProps.errors[formikKey]}
+  //     </Text>
+  //   </View>
+  // );
 };
 
 //validation requirements
@@ -75,6 +116,13 @@ const validationSchema = yup.object().shape({
     .required()
     .min(2, "At least 2 characters")
     .max(15, "At most 15 characters"),
+  confirmPassword: yup
+    .string()
+    .label("Confirm password")
+    .required()
+    .test("password-match", "Password must match", function (value) {
+      return this.parent.password === value;
+    }),
   agreeToTerm: yup
     .boolean()
     .label("Term")
@@ -89,7 +137,12 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <Formik
-        initialValues={{ email: "", password: "", agreeToTerm: false }}
+        initialValues={{
+          email: "",
+          password: "",
+          confirmPassword: "",
+          agreeToTerm: false,
+        }}
         onSubmit={(values, actions) => {
           alert(JSON.stringify(values));
           setTimeout(() => actions.setSubmitting(false), 1000);
@@ -117,12 +170,53 @@ export default function App() {
               secureTextEntry
             />
 
+            {/* Ô nhập confirm password dùng khung có sẵn */}
+            <StyleInput
+              lable='Confirm Password'
+              formikProps={formikProps}
+              formikKey='confirmPassword'
+              placeholder='Confirm password'
+              secureTextEntry
+            />
+
             {/* Ô Switch */}
             <StyleSwitch
               label='Agree to Term'
               formikProps={formikProps}
               formikKey='agreeToTerm'
             />
+
+            {/* Khung nhập email original */}
+            {/* <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
+              <Text style={{ marginBottom: 3 }}>Email</Text>
+              <View style={styles.input}>
+                <TextInput
+                  placeholder='example@gmail.com'
+                  onChangeText={formikProps.handleChange("email")}
+                  onBlur={formikProps.handleBlur("email")}
+                  autoFocus
+                />
+              </View>
+              <Text style={styles.errorHandler}>
+                {formikProps.touched.email && formikProps.errors.email}
+              </Text>
+            </View> */}
+
+            {/* Khung nhập password original */}
+            {/* <View style={{ marginHorizontal: 20, marginVertical: 5 }}>
+              <Text style={{ marginBottom: 3 }}>Password</Text>
+              <View style={styles.input}>
+                <TextInput
+                  placeholder='password'
+                  onChangeText={formikProps.handleChange("password")}
+                  onBlur={formikProps.handleBlur("password")}
+                  secureTextEntry
+                />
+              </View>
+              <Text style={styles.errorHandler}>
+                {formikProps.touched.password && formikProps.errors.password}
+              </Text>
+            </View> */}
 
             {formikProps.isSubmitting ? (
               <ActivityIndicator />
