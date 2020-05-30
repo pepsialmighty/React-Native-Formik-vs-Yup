@@ -133,6 +133,17 @@ const validationSchema = yup.object().shape({
     ),
 });
 
+const signUp = ({ email }) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (email === "a@a.com") {
+        reject(new Error("Your email address is fake"));
+      }
+      resolve(true);
+    }, 1000);
+  });
+};
+
 export default function App() {
   return (
     <SafeAreaView style={styles.container}>
@@ -144,8 +155,12 @@ export default function App() {
           agreeToTerm: false,
         }}
         onSubmit={(values, actions) => {
-          alert(JSON.stringify(values));
-          setTimeout(() => actions.setSubmitting(false), 1000);
+          signUp({ email: values.email })
+            .then(() => alert(JSON.stringify(values)))
+            .catch((error) => {
+              actions.setFieldError("general", error.message);
+            })
+            .finally(() => actions.setSubmitting(false));
         }}
         validationSchema={validationSchema}
       >
@@ -163,7 +178,7 @@ export default function App() {
 
             {/* Ô nhập password dùng khung có sẵn */}
             <StyleInput
-              lable='Password'
+              label='Password'
               formikProps={formikProps}
               formikKey='password'
               placeholder='password'
@@ -172,7 +187,7 @@ export default function App() {
 
             {/* Ô nhập confirm password dùng khung có sẵn */}
             <StyleInput
-              lable='Confirm Password'
+              label='Confirm Password'
               formikProps={formikProps}
               formikKey='confirmPassword'
               placeholder='Confirm password'
@@ -221,7 +236,12 @@ export default function App() {
             {formikProps.isSubmitting ? (
               <ActivityIndicator />
             ) : (
-              <Button title='Submit' onPress={formikProps.handleSubmit} />
+              <React.Fragment>
+                <Button title='Submit' onPress={formikProps.handleSubmit} />
+                <Text style={styles.errorHandler}>
+                  {formikProps.errors.general}
+                </Text>
+              </React.Fragment>
             )}
           </React.Fragment>
         )}
